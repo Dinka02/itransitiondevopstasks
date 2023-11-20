@@ -1,0 +1,57 @@
+---
+- name: Конфигурация виртуальной машины
+  hosts: ubuntu  # Замените на имя хоста вашей виртуальной машины или группу хостов
+  become: yes  # Для выполнения задач с правами суперпользователя
+
+  tasks:
+    - name: Обновление пакетов
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Установка веб-сервера (Apache)
+      apt:
+        name: apache2
+        state: present
+
+    - name: Создание пользовательского аккаунта и установка SSH-ключа
+      user:
+        name: vagrant  # Замените на желаемое имя пользователя
+        createhome: yes
+
+    - name: Установка SSH-ключа для аутентификации
+      authorized_key:
+        user: vagrant  # Замените на ваше имя пользователя
+        key: "{{ lookup('file', 'D/vagrant_env/id_rsa.pub') }}"  # Замените на путь к вашему публичному SSH-ключу
+
+    - name: Перезапуск веб-сервера после изменений
+      service:
+        name: apache2
+        state: restarted
+
+
+
+- name: Перезапуск веб-сервера после изменений
+      service:
+        name: apache2
+        state: restarted
+
+    - name: Создание текстового файла с временем его создания
+      command: touch /путь/к/вашему/файлу.txt
+
+    - name: Установка дополнительного программного обеспечения (Nginx)
+      apt:
+        name: nginx
+        state: present
+
+    - name: Создание расписания с использованием cron
+      cron:
+        name: "Регулярная очистка временных файлов"
+        minute: "0"
+        hour: "3"
+        job: "find /tmp -type f -mtime +7 -exec rm -f {} \;"
+
+    - name: Перезапуск службы Nginx после установки
+      service:
+        name: nginx
+        state: restarted
